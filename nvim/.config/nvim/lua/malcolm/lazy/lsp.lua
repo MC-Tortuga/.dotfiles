@@ -33,6 +33,12 @@ return {
             ensure_installed = {
                 "lua_ls",
                 "gopls",
+                "zls",
+                "omnisharp",
+                "rust_analyzer",
+                "jdtls",
+                "pylsp",
+                "ts_ls"
             },
             handlers = {
                 function(server_name) -- default handler (optional)
