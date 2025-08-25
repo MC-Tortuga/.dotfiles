@@ -38,7 +38,8 @@ return {
                 "rust_analyzer",
                 "jdtls",
                 "pylsp",
-                "ts_ls"
+                "ts_ls",
+                "templ"
             },
             handlers = {
                 function(server_name) -- default handler (optional)
