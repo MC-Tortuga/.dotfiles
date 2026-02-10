@@ -16,7 +16,8 @@ return {
 
     config = function()
         require("conform").setup({
-            formatters_by_ft = {},
+            formatters_by_ft = {
+                cs = { 'csharpier' } },
         })
         local cmp = require("cmp")
         local cmp_lsp = require("cmp_nvim_lsp")
