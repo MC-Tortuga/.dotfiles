@@ -12,9 +12,13 @@ return {
         "L3MON4D3/LuaSnip",
         "saadparwaiz1/cmp_luasnip",
         "j-hui/fidget.nvim",
+        "rafamadriz/friendly-snippets"
     },
 
     config = function()
+        local luasnip = require("luasnip")
+        require("luasnip.loaders.from_vscode").lazy_load()
+        luasnip.filetype_extend("cs", { "csharp" })
         require("conform").setup({
             formatters_by_ft = {
                 cs = { 'csharpier' } },
@@ -96,10 +100,11 @@ return {
                 ["<C-Space>"] = cmp.mapping.complete(),
             }),
             sources = cmp.config.sources({
-                { name = "nvim_lsp" },
-                { name = "luasnip" }, -- For luasnip users.
+               { name = "nvim_lsp", priority = 1000 },
+                { name = "luasnip",  priority = 750 }, -- For luasnip users.
             }, {
                 { name = "buffer" },
+             --   { name = "path" },
             }),
         })
 

@@ -102,5 +102,12 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+alias update="sudo pacman -Syu"
+
 eval "$(ssh-agent -s)"
 eval "$(zoxide init zsh)"   
+
+# opencode
+[[ -f ~/.zshrc_private ]] && source ~/.zshrc_private
+export PATH=$SECRET_PATH:$PATH
+export PATH="$NPM_GLOBAL_PATH:$PATH"
