@@ -4,8 +4,8 @@ if not vim.loop.fs_stat(lazypath) then
 		"git",
 		"clone",
 		"--filter=blob:none",
-		"https://github.com/folke/lazy.nvim.git",
-		"--branch=stable", -- latest stable release
+		"git@github.com:folke/lazy.nvim.git",
+		"--branch=stable",
 		lazypath,
 	})
 end
@@ -14,4 +14,7 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
 	spec = "malcolm.lazy",
 	change_detection = { notify = false },
+	git = {
+		url_format = "git@github.com:%s",
+	},
 })

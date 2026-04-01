@@ -4,7 +4,7 @@ local function navigate(args)
 	local buffer = args.buf
 
 	local wid = nil
-	local win_ids = vim.api.nvim_list_wins() -- Get all window IDs
+	local win_ids = vim.api.nvim_list_wins()
 	for _, win_id in ipairs(win_ids) do
 		local win_bufnr = vim.api.nvim_win_get_buf(win_id)
 		if win_bufnr == buffer then
@@ -34,18 +34,14 @@ end
 return {
 	{
 		"mfussenegger/nvim-dap",
-		lazy = false,
 		config = function()
-			local dap = require("dap")
-			dap.set_log_level("DEBUG")
-
-			vim.keymap.set("n", "<F8>", dap.continue, { desc = "Debug: Continue" })
-			vim.keymap.set("n", "<F10>", dap.step_over, { desc = "Debug: Step Over" })
-			vim.keymap.set("n", "<F11>", dap.step_into, { desc = "Debug: Step Into" })
-			vim.keymap.set("n", "<F12>", dap.step_out, { desc = "Debug: Step Out" })
-			vim.keymap.set("n", "<leader>b", dap.toggle_breakpoint, { desc = "Debug: Toggle Breakpoint" })
+			vim.keymap.set("n", "<F8>", function() require("dap").continue() end, { desc = "Debug: Continue" })
+			vim.keymap.set("n", "<F10>", function() require("dap").step_over() end, { desc = "Debug: Step Over" })
+			vim.keymap.set("n", "<F11>", function() require("dap").step_into() end, { desc = "Debug: Step Into" })
+			vim.keymap.set("n", "<F12>", function() require("dap").step_out() end, { desc = "Debug: Step Out" })
+			vim.keymap.set("n", "<leader>b", function() require("dap").toggle_breakpoint() end, { desc = "Debug: Toggle Breakpoint" })
 			vim.keymap.set("n", "<leader>B", function()
-				dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
+				require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
 			end, { desc = "Debug: Set Conditional Breakpoint" })
 		end,
 	},
@@ -141,7 +137,7 @@ return {
 
 			dap.listeners.after.event_output.dapui_config = function(_, body)
 				if body.category == "console" then
-					dapui.eval(body.output) -- Sends stdout/stderr to Console
+					dapui.eval(body.output)
 				end
 			end
 		end,

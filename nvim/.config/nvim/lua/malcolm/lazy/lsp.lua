@@ -1,38 +1,26 @@
 return {
     "neovim/nvim-lspconfig",
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-        "stevearc/conform.nvim",
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
-        "hrsh7th/cmp-nvim-lsp",
-        "hrsh7th/cmp-buffer",
-        "hrsh7th/cmp-path",
-        "hrsh7th/cmp-cmdline",
-        "hrsh7th/nvim-cmp",
-        "L3MON4D3/LuaSnip",
-        "saadparwaiz1/cmp_luasnip",
-        "j-hui/fidget.nvim",
-        "rafamadriz/friendly-snippets"
     },
-
     config = function()
-        local luasnip = require("luasnip")
-        require("luasnip.loaders.from_vscode").lazy_load()
-        luasnip.filetype_extend("cs", { "csharp" })
-        require("conform").setup({
-            formatters_by_ft = {
-                cs = { 'csharpier' } },
-        })
-        local cmp = require("cmp")
         local cmp_lsp = require("cmp_nvim_lsp")
         local capabilities = vim.tbl_deep_extend(
             "force",
             {},
             vim.lsp.protocol.make_client_capabilities(),
-            cmp_lsp.default_capabilities()
+            cmp_lsp.default_capabilities(),
+            {
+                textDocument = {
+                    inlayHint = {
+                        dynamicRegistration = true,
+                    },
+                },
+            }
         )
 
-        require("fidget").setup({})
         require("mason").setup()
         require("mason-lspconfig").setup({
             ensure_installed = {
@@ -41,17 +29,50 @@ return {
                 "zls",
                 "omnisharp",
                 "rust_analyzer",
-                "jdtls",
                 "pylsp",
                 "ts_ls",
                 "templ"
             },
             handlers = {
-                function(server_name) -- default handler (optional)
-                    require("lspconfig")[server_name].setup({
+                function(server_name)
+                    local lspconfig = require("lspconfig")
+                    local server = lspconfig[server_name]
+                    local opts = {
                         capabilities = capabilities,
-                    })
+                        on_attach = function(client, bufnr)
+                            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+                            if server_name == "omnisharp" then
+                                vim.api.nvim_create_autocmd({ "TextChangedI", "CursorHold" }, {
+                                    buffer = bufnr,
+                                    callback = function()
+                                        vim.lsp.buf.request(bufnr, "textDocument/diagnostic", {
+                                            textDocument = vim.lsp.util.make_text_document_params(bufnr),
+                                        })
+                                    end,
+                                })
+                            end
+                        end,
+                    }
+                    if server_name == "omnisharp" then
+                        opts.settings = {
+                            ["csharp.formatting"] = {
+                                NewLinesForBracesInLambdaExpressionBody = true,
+                                NewLinesForBracesInAnonymousMethods = true,
+                                NewLinesForBracesInControlStatements = true,
+                                NewLinesForBracesInObjectCollectionArrayInitializers = true,
+                                NewLinesForBracesInMethodsAndConstructors = true,
+                                NewLinesForBracesInProperties = true,
+                                NewLinesForBracesInTypes = true,
+                            },
+                        }
+                    end
+                    server.setup(opts)
                 end,
+
+                ["textDocument/publishDiagnostics"] = vim.lsp.with(
+                    vim.lsp.diagnostic.on_publish_diagnostics,
+                    { update_in_insert_mode = true }
+                ),
 
                 zls = function()
                     local lspconfig = require("lspconfig")
@@ -82,41 +103,6 @@ return {
                         },
                     })
                 end,
-            },
-        })
-
-        local cmp_select = { behavior = cmp.SelectBehavior.Select }
-
-        cmp.setup({
-            snippet = {
-                expand = function(args)
-                    require("luasnip").lsp_expand(args.body) -- For `luasnip` users.
-                end,
-            },
-            mapping = cmp.mapping.preset.insert({
-                ["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
-                ["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
-                ["<TAB>"] = cmp.mapping.confirm({ select = true }),
-                ["<C-Space>"] = cmp.mapping.complete(),
-            }),
-            sources = cmp.config.sources({
-               { name = "nvim_lsp", priority = 1000 },
-                { name = "luasnip",  priority = 750 }, -- For luasnip users.
-            }, {
-                { name = "buffer" },
-             --   { name = "path" },
-            }),
-        })
-
-        vim.diagnostic.config({
-            -- update_in_insert = true,
-            float = {
-                focusable = false,
-                style = "minimal",
-                border = "rounded",
-                source = "always",
-                header = "",
-                prefix = "",
             },
         })
     end,

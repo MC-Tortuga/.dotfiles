@@ -1,11 +1,9 @@
 require("malcolm.set")
 require("malcolm.remap")
 require("malcolm.lazy_init")
+require("malcolm.diagnostics")
 
 local augroup = vim.api.nvim_create_augroup
-local MalcolmGroup = augroup("Malcolm", {})
-
-local autocmd = vim.api.nvim_create_autocmd
 local yank_group = augroup("HighlightYank", {})
 
 vim.filetype.add({
@@ -14,7 +12,7 @@ vim.filetype.add({
     }
 })
 
-autocmd("TextYankPost", {
+vim.api.nvim_create_autocmd("TextYankPost", {
     group = yank_group,
     pattern = "*",
     callback = function()

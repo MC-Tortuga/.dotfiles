@@ -111,3 +111,4 @@ eval "$(zoxide init zsh)"
 [[ -f ~/.zshrc_private ]] && source ~/.zshrc_private
 export PATH=$SECRET_PATH:$PATH
 export PATH="$NPM_GLOBAL_PATH:$PATH"
+export PATH="$PATH:$HOME/.dotnet/tools"
