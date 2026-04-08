@@ -1,4 +1,4 @@
 keybind = performable:ctrl+c=copy_to_clipboard
 keybind = ctrl+v=paste_from_clipboard
 theme = Catppuccin Mocha 
-font-family = "Fira Code"
+font-family = "FiraCode Nerd Font"
